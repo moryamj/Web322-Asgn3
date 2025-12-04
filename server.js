@@ -45,11 +45,24 @@ app.use((req, res, next) => {
     next();
 });
 
-// Routes
+let isMongoReady = false;
+
+mongoose.connection.once('connected', () => {
+    isMongoReady = true;
+    console.log('MongoDB is ready');
+});
+
+app.use((req, res, next) => {
+    if (isMongoReady || req.path.includes('.') || req.path.startsWith('/auth')) {
+        return next();
+    }
+    setTimeout(() => next(), 200);
+});
+
+// Routes 
 app.use('/auth', require('./routes/auth'));
 app.use('/tasks', require('./middleware/auth'), require('./routes/tasks'));
 
-// Dashboard & Home
 app.get('/dashboard', require('./middleware/auth'), (req, res) => {
     res.render('dashboard', { user: req.session.user });
 });
@@ -58,35 +71,18 @@ app.get('/', (req, res) => {
     req.session.user ? res.redirect('/dashboard') : res.render('index');
 });
 
-// 404 Page
 app.use((req, res) => {
     res.status(404).render('404', { user: req.session.user || null });
 });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, { 
-    dialect: 'postgres', 
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
     logging: false,
-    dialectOptions: process.env.NODE_ENV === 'production' ? { ssl: { require: true, rejectUnauthorized: false } } : {}
-});
-
-let mongoReady = false;
-
-mongoose.connection.on('connected', () => {
-    mongoReady = true;
-    console.log('MongoDB ready for requests');
-});
-
-app.use((req, res, next) => {
-    if (mongoReady || req.path.startsWith('/auth/login') || req.path.startsWith('/auth/register')) {
-        return next();
+    dialectOptions: {
+        ssl: process.env.NODE_ENV === 'production' ? { require: true, rejectUnauthorized: false } : false
     }
-    if (!mongoReady) {
-        return setTimeout(() => next(), 100);
-    }
-    next();
 });
 
-// Start connections
 (async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
@@ -98,8 +94,8 @@ app.use((req, res, next) => {
         await sequelize.authenticate();
         console.log('PostgreSQL connected');
     } catch (err) {
-        console.error('Database connection error:', err);
+        console.error('DB error:', err);
     }
 })();
 
-module.exports = app; 
+module.exports = app;
