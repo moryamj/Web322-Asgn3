@@ -9,21 +9,32 @@ router.get('/register', (req, res) => {
 
 // POST register
 router.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        if (!username || !email || !password) {
-            return res.render('register', { error: 'All fields are required' });
-        }
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            return res.render('register', { error: 'Username or email already exists' });
-        }
-        const user = new User({ username, email, password });
-        await user.save();
-        res.redirect('/auth/login');
-    } catch (err) {
-        res.render('register', { error: 'Registration failed' });
+  try {
+    const { username, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      return res.render('register', { 
+        error: 'Username or email already taken' 
+      });
     }
+
+    // Create new user → password auto-hashed by pre-save hook
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+
+    res.redirect('/auth/login');
+  } catch (err) {
+    // ← THIS CATCH IS MISSING IN YOUR CODE RIGHT NOW
+    console.error('Registration error:', err);
+    res.render('register', { 
+      error: 'Registration failed. Please try again.' 
+    });
+  }
 });
 
 // GET login
