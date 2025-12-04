@@ -6,7 +6,7 @@
 *
 * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
 *
-* Name: Maryam Jawed          Student ID: 170378236          Date: Dec 03, 2025
+* Name: Maryam Jawed          Student ID: 170378236          Date: Dec 04, 2025
 *
 ********************************************************************************/
 
@@ -39,7 +39,6 @@ app.use(session({
     ephemeral: true
 }));
 
-// Auth Middleware
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
@@ -49,7 +48,7 @@ app.use((req, res, next) => {
 app.use('/auth', require('./routes/auth'));
 app.use('/tasks', require('./middleware/auth'), require('./routes/tasks'));
 
-// Dashboard & Home
+// Home & Dashboard
 app.get('/dashboard', require('./middleware/auth'), (req, res) => {
     res.render('dashboard', { user: req.session.user });
 });
@@ -58,28 +57,31 @@ app.get('/', (req, res) => {
     req.session.user ? res.redirect('/dashboard') : res.render('index');
 });
 
-// 404 Page
+// 404
 app.use((req, res) => {
     res.status(404).render('404', { user: req.session.user || null });
 });
 
-// Start Server 
+// Database connections 
 (async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB connected');
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('MongoDB connected');
 
-    const sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: 'postgres', logging: false });
-    await sequelize.authenticate();
-    console.log('PostgreSQL connected');
+        const sequelize = new Sequelize(process.env.DATABASE_URL, {
+            dialect: 'postgres',
+            logging: false
+        });
+        await sequelize.authenticate();
+        console.log('PostgreSQL connected');
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
+        app.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
 
-  } catch (err) {
-    console.error('Failed to start server:', err);
-  }
+    } catch (err) {
+        console.error('Startup failed:', err);
+    }
 })();
 
 module.exports = app;
