@@ -66,7 +66,13 @@ app.use((req, res) => {
 // Start Server
 (async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 30000,
+            bufferCommands: false,
+            bufferMaxEntries: 0,
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
         console.log('MongoDB connected');
 
         const sequelize = new Sequelize(process.env.DATABASE_URL, {
