@@ -63,23 +63,43 @@ app.use((req, res) => {
     res.status(404).render('404', { user: req.session.user || null });
 });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: 'postgres', logging: false });
+const sequelize = new Sequelize(process.env.DATABASE_URL, { 
+    dialect: 'postgres', 
+    logging: false,
+    dialectOptions: process.env.NODE_ENV === 'production' ? { ssl: { require: true, rejectUnauthorized: false } } : {}
+});
 
+let mongoReady = false;
+
+mongoose.connection.on('connected', () => {
+    mongoReady = true;
+    console.log('MongoDB ready for requests');
+});
+
+app.use((req, res, next) => {
+    if (mongoReady || req.path.startsWith('/auth/login') || req.path.startsWith('/auth/register')) {
+        return next();
+    }
+    if (!mongoReady) {
+        return setTimeout(() => next(), 100);
+    }
+    next();
+});
+
+// Start connections
 (async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 30000,
-      bufferCommands: false
-    });
-    console.log('MongoDB connected');
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 30000,
+            bufferCommands: false
+        });
+        console.log('MongoDB connected');
 
-    await sequelize.authenticate();
-    console.log('PostgreSQL connected');
-
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
+        await sequelize.authenticate();
+        console.log('PostgreSQL connected');
+    } catch (err) {
+        console.error('Database connection error:', err);
+    }
 })();
 
-module.exports = app;
+module.exports = app; 
