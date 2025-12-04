@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+
+<div class="container text-center mt-5">
+    <div class="alert alert-warning">
+        <h1>404 – Page Not Found</h1>
+        <p>Sorry, we couldn't find the page you're looking for.</p>
+        <hr>
+        <% if (user) { %>
+            <a href="/dashboard" class="btn btn-primary btn-lg">Go to Dashboard</a>
+        <% } else { %>
+            <a href="/auth/login" class="btn btn-primary btn-lg">Go to Login</a>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

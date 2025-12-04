@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<h2>Edit Task</h2>
+<form method="POST">
+    <div class="mb-3"><input type="text" name="title" value="<%= task.title %>" class="form-control" required></div>
+    <div class="mb-3"><textarea name="description" class="form-control" rows="3"><%= task.description || '' %></textarea></div>
+    <div class="mb-3"><input type="date" name="dueDate" value="<%= task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '' %>" class="form-control"></div>
+    <div class="mb-3">
+        <select name="status" class="form-select">
+            <option value="pending" <%= task.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="completed" <%= task.status === 'completed' ? 'selected' : '' %>>Completed</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Task</button>
+    <a href="/tasks" class="btn btn-secondary">Cancel</a>
+</form>
+
+<%- include('partials/footer') %>

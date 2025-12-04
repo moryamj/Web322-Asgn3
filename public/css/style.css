@@ -1,0 +1,79 @@
+/* Modern clean look for WEB322 Assignment 3 */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(to right, #667eea 0%, #764ba2 100%) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.navbar-brand {
+    font-weight: 800 !important;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.btn {
+    border-radius: 12px !important;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #667eea, #764ba2);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(to right, #11998e, #38ef7d);
+    border: none;
+}
+
+.btn-warning { background: #f093fb; background: linear-gradient(to right, #f093fb, #f5576c); border: none; }
+.btn-danger  { background: linear-gradient(to right, #ff0844, #ffb199); border: none; }
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+h1, h2, h3, .display-4 {
+    font-weight: 700;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
