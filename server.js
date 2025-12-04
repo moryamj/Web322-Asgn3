@@ -67,11 +67,8 @@ app.use((req, res) => {
 (async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 30000,
-            bufferCommands: false,
-            bufferMaxEntries: 0,
-            useNewUrlParser: true,
-            useUnifiedTopology: true
+            serverSelectionTimeoutMS: 30000, // Longer timeout for Vercel
+            bufferCommands: false // Disable Mongoose buffering
         });
         console.log('MongoDB connected');
 
