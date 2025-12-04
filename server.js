@@ -63,7 +63,8 @@ app.use((req, res) => {
     res.status(404).render('404', { user: req.session.user || null });
 });
 
-// Start Server
+const sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: 'postgres', logging: false });
+
 (async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
@@ -74,10 +75,6 @@ app.use((req, res) => {
 
     await sequelize.authenticate();
     console.log('PostgreSQL connected');
-
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
 
   } catch (err) {
     console.error('Failed to start server:', err);
