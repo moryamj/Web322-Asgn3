@@ -45,24 +45,11 @@ app.use((req, res, next) => {
     next();
 });
 
-let isMongoReady = false;
-
-mongoose.connection.once('connected', () => {
-    isMongoReady = true;
-    console.log('MongoDB is ready');
-});
-
-app.use((req, res, next) => {
-    if (isMongoReady || req.path.includes('.') || req.path.startsWith('/auth')) {
-        return next();
-    }
-    setTimeout(() => next(), 200);
-});
-
-// Routes 
+// Routes
 app.use('/auth', require('./routes/auth'));
 app.use('/tasks', require('./middleware/auth'), require('./routes/tasks'));
 
+// Dashboard & Home
 app.get('/dashboard', require('./middleware/auth'), (req, res) => {
     res.render('dashboard', { user: req.session.user });
 });
@@ -71,31 +58,28 @@ app.get('/', (req, res) => {
     req.session.user ? res.redirect('/dashboard') : res.render('index');
 });
 
+// 404 Page
 app.use((req, res) => {
     res.status(404).render('404', { user: req.session.user || null });
 });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    logging: false,
-    dialectOptions: {
-        ssl: process.env.NODE_ENV === 'production' ? { require: true, rejectUnauthorized: false } : false
-    }
-});
-
+// Start Server 
 (async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 30000,
-            bufferCommands: false
-        });
-        console.log('MongoDB connected');
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB connected');
 
-        await sequelize.authenticate();
-        console.log('PostgreSQL connected');
-    } catch (err) {
-        console.error('DB error:', err);
-    }
+    const sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: 'postgres', logging: false });
+    await sequelize.authenticate();
+    console.log('PostgreSQL connected');
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('Failed to start server:', err);
+  }
 })();
 
 module.exports = app;
