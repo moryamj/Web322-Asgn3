@@ -12,7 +12,6 @@ router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { username }]
     });
@@ -23,13 +22,11 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Create new user → password auto-hashed by pre-save hook
     const newUser = new User({ username, email, password });
     await newUser.save();
 
     res.redirect('/auth/login');
   } catch (err) {
-    // ← THIS CATCH IS MISSING IN YOUR CODE RIGHT NOW
     console.error('Registration error:', err);
     res.render('register', { 
       error: 'Registration failed. Please try again.' 
