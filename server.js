@@ -65,28 +65,24 @@ app.use((req, res) => {
 
 // Start Server
 (async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 30000, // Longer timeout for Vercel
-            bufferCommands: false // Disable Mongoose buffering
-        });
-        console.log('MongoDB connected');
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 30000,
+      bufferCommands: false
+    });
+    console.log('MongoDB connected');
 
-        const sequelize = new Sequelize(process.env.DATABASE_URL, {
-            dialect: 'postgres',
-            dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
-            logging: false
-        });
-        await sequelize.authenticate();
-        console.log('PostgreSQL connected');
+    await sequelize.authenticate();
+    console.log('PostgreSQL connected');
 
-        const Task = require('./models/Task')(sequelize);
-        await sequelize.sync();
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
 
-        app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-    } catch (err) {
-        console.error('Startup error:', err);
-    }
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
 })();
 
 module.exports = app;
